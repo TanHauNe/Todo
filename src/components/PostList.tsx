@@ -1,14 +1,13 @@
-import React, { useEffect } from "react";
-import { RootState, useAppDispatch } from "@/redux/store";
-import { useDispatch, useSelector } from "react-redux";
-import PostItem from "./PostItem";
 import { deletePost, getPostList, startEditPost } from "@/redux/blog/blogSlice";
-import { getData } from "@/utils/http";
-import styled from "styled-components";
+import { RootState, useAppDispatch } from "@/redux/store";
+import { useEffect } from "react";
+import { useSelector } from "react-redux";
+import PostItem from "./PostItem";
+import styles from "./PostList.module.css";
 
 const PostList = () => {
   const postList = useSelector((state: RootState) => state.blog.postList);
-  console.log(postList);
+  const user = useSelector((state: RootState) => state.user.auth);
   const dispatch = useAppDispatch();
 
   useEffect(() => {
@@ -16,8 +15,8 @@ const PostList = () => {
   }, [dispatch]);
 
   const handleDelete = (postId: string) => {
-    const updatedPostList = postList.filter((post) => post._id !== postId);
     dispatch(deletePost(postId));
+    dispatch(getPostList());
   };
 
   const handleStartEditPost = (postId: string) => {
@@ -25,7 +24,7 @@ const PostList = () => {
   };
 
   return (
-    <Container>
+    <div className={styles.container}>
       {postList.map((post) => (
         <PostItem
           post={post}
@@ -34,15 +33,8 @@ const PostList = () => {
           handleStartEditPost={handleStartEditPost}
         />
       ))}
-    </Container>
+    </div>
   );
 };
 
 export default PostList;
-
-const Container = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-around;
-  gap: 20px;
-`;

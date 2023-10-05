@@ -1,100 +1,89 @@
 "use client";
 
-import { RootState } from "@/redux/store";
-import { DevTool } from "@hookform/devtools";
-import React, { useEffect, useState } from "react";
+import InputComponent from "@/common/InputComponent";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { RootState, useAppDispatch } from "@/redux/store";
+import { Button, Form } from "antd";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
-import styled from "styled-components";
-import { User } from "../types/register.type";
-import { registerUser } from "../../redux/user/userSlice";
-import { postUser } from "@/utils/http";
-import { Input } from "antd";
+import { ILogin } from "../types/User.type";
+import styles from "./page.module.css";
+import { loginUser } from "@/redux/user/userSlice";
+import { schema } from "@/utils/schema";
 
-const Register = () => {
-  const dispatch = useDispatch();
+const Login = () => {
+  const loginSchema = schema.pick(["email", "password"]);
+  const dispatch = useAppDispatch();
   const [showError, setShowError] = useState("");
+  const user = useSelector((state: RootState) => state.user);
+  const token = user.auth.access_token;
 
-  const form = useForm<User>({
+  const route = useRouter();
+  const form = useForm<ILogin>({
     defaultValues: {
       email: "",
-      fullName: "",
-      urlImg: "",
       password: "",
     },
+    resolver: yupResolver(loginSchema),
   });
 
-  const { register, control, handleSubmit, formState } = form;
+  useEffect(() => {
+    if (user.auth?.access_token) {
+      route.push("/blog");
+    }
+  }, [token]);
+
+  const { control, handleSubmit, formState } = form;
   const { errors } = formState;
 
-  const onSubmit = (data: User) => {
+  const onSubmit = (data: ILogin) => {
     const postData = {
       email: data.email,
-      full_name: data.fullName,
-      url_img: data.urlImg,
       password: data.password,
     };
 
-    postUser(postData)
-      .then((response) => {
-        console.log("Dữ liệu trả về:", response.data);
-      })
-      .catch((error) => {
-        console.error("Lỗi:", error.response.data.errors[0]);
-        setShowError(error.response.data.errors[0]);
-      });
+    dispatch(loginUser(postData));
   };
 
   return (
-    <Container>
- 
-      <Form action="" onSubmit={handleSubmit(onSubmit)}>
-        <label htmlFor="email">Email</label>
-        <input
-          type="text"
-          id="email"
-          {...register("email", {
-            required: { value: true, message: "Email is required" },
-            pattern: {
-              value: /^([a-zA-Z0-9._%-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})$/,
-              message: "Invalid",
-            },
-            validate: (fieldValue) => {
-              return (
-                fieldValue !== "hau123@gmail.com" || "Enter a different email"
-              );
-            },
-          })}
-        />
-        {errors.email?.message}
+    <div className={styles.container}>
+      <Form onFinish={handleSubmit(onSubmit)} className={styles.login_form}>
+        <Form.Item
+          name="email"
+          validateStatus={errors.email ? "error" : ""}
+          help={errors.email?.message}
+        >
+          <InputComponent
+            label="Email"
+            placeholder="Email"
+            name="email"
+            control={control}
+          />
+        </Form.Item>
 
-        <label htmlFor="password">Password</label>
-        <input
-          type="text"
-          id="password"
-          {...register("password", {
-            required: { value: true, message: "Password is required" },
-          })}
-        />
-        {errors.password?.message}
-        <p>{showError}</p>
+        <Form.Item
+          name="password"
+          validateStatus={errors.password ? "error" : ""}
+          help={errors.password?.message}
+        >
+          <InputComponent
+            label="Password"
+            name="password"
+            placeholder="Password"
+            control={control}
+          />
+        </Form.Item>
 
-        <button>Submit</button>
+        <Form.Item>
+          <Button type="primary" htmlType="submit">
+            Login
+          </Button>
+        </Form.Item>
       </Form>
-    </Container>
+    </div>
   );
 };
 
-export default Register;
-
-const Container = styled.div`
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-`;
-
-const Form = styled.form`
-  display: flex;
-  flex-direction: column;
-`;
+export default Login;

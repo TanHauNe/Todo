@@ -1,9 +1,9 @@
-import { Post } from "@/app/types/Post.type";
+import { IPost } from "@/app/types/Post.type";
 import { Button, Card } from "antd";
-import { styled } from "styled-components";
+import styles from "./PostItem.module.css";
 
 interface PostItemType {
-  post: Post;
+  post: IPost;
   handleDelete: (postId: string) => void;
   handleStartEditPost: (postId: string) => void;
 }
@@ -15,25 +15,20 @@ const PostItem = ({
 }: PostItemType) => {
   return (
     <Card bordered={false} title={post?.title} hoverable style={{ width: 600 }}>
-      <div>
-        <p>{post.desc}</p>
-      </div>
-      <ButtonGroup>
-        <Button onClick={() => handleStartEditPost(post._id)} type="primary">
+      <p>{post.desc}</p>
+      <div className={styles.button_group}>
+        <Button
+          onClick={() => handleStartEditPost(post._id || "")}
+          type="primary"
+        >
           Edit
         </Button>
-        <Button onClick={() => handleDelete(post._id)} type="primary">
+        <Button onClick={() => handleDelete(post._id || "")} type="primary">
           Delete
         </Button>
-      </ButtonGroup>
+      </div>
     </Card>
   );
 };
 
 export default PostItem;
-
-const ButtonGroup = styled.div`
-  display: flex;
-  justify-content: flex-end;
-  gap: 20px;
-`;

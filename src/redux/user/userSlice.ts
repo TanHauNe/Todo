@@ -1,34 +1,63 @@
-import {
-  PayloadAction,
-  createAction,
-  createReducer,
-  createSlice,
-} from "@reduxjs/toolkit";
-import { User } from "../../app/types/register.type";
+import { IPost } from "@/app/types/Post.type";
+import { IAuth, ILogin } from "@/app/types/User.type";
+import { deleteData, getData, loginAPI, postData, putData } from "@/utils/http";
+import { PayloadAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
 interface UserState {
-  userList: User[];
+  auth: IAuth;
+  isLoading: boolean;
 }
 
 const initialState: UserState = {
-  userList: [],
+  auth: {
+    user: {
+      _id: "",
+      email: "",
+      full_name: "",
+      url_img: "",
+      role: 0,
+      createdAt: "",
+      updatedAt: "",
+      __v: 0,
+    },
+    access_token: "",
+    refresh_token: "",
+  },
+  isLoading: false,
 };
 
-export const registerUser = createAction<User>("user/registerUser");
+export const loginUser = createAsyncThunk(
+  "user/loginUser",
+  async (body: ILogin, thunkAPI) => {
+    try {
+      const response = await loginAPI(body);
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  }
+);
 
-const userReducer = createReducer(initialState, (builder) => {
-  builder.addCase(registerUser, (state, action) => {
-    const user = action.payload;
-    state.userList.push(user);
-  });
-});
-
-const userSlice = createSlice({
-  name: "user",
+const blogSlice = createSlice({
+  name: "blog",
   initialState,
-  reducers: {
-    registerUser: (state, action: PayloadAction<User>) => {},
+  reducers: {},
+  extraReducers(builder) {
+    builder
+      .addCase(loginUser.fulfilled, (state, action) => {
+        state.auth = action.payload;
+        const { user, access_token } = action.payload;
+        localStorage.setItem("access_token", access_token);
+        localStorage.setItem("user_id", user?._id);
+        state.isLoading = false;
+      })
+      .addCase(loginUser.pending, (state, action) => {
+        state.isLoading = true;
+      })
+      .addCase(loginUser.rejected, (state, action) => {
+        state.isLoading = false;
+      });
   },
 });
 
-export default userReducer;
+export default blogSlice.reducer;

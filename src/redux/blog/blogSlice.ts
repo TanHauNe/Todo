@@ -1,75 +1,65 @@
-import { Post } from "@/app/types/Post.type";
+import { IPost } from "@/app/types/Post.type";
 import { deleteData, getData, postData, putData } from "@/utils/http";
-import {
-  PayloadAction,
-  createAction,
-  createAsyncThunk,
-  createReducer,
-  createSlice,
-} from "@reduxjs/toolkit";
+import { PayloadAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
 interface BlogState {
-  postList: Post[];
-  editPost: Post | null;
+  postList: IPost[];
+  editPost: IPost | null;
+  isLoading: boolean;
 }
 
 const initialState: BlogState = {
   postList: [],
   editPost: null,
+  isLoading: false,
 };
-
-// export const addPost = createAction<Post>("blog/addPost");
-// export const deletePost = createAction<string>("blog/deletePost");
-// export const startEditPost = createAction<string>("blog/startEditPost");
-// export const cancelEditPost = createAction("blog/cancelEditPost");
-// export const finishEditPost = createAction<Post>("blog/finishEditPost");
-
-// const blogReducer = createReducer(initialState, (builder) => {
-//   builder
-//     .addCase(addPost, (state, action) => {
-//       state.postList.push(action.payload);
-//     })
-//     .addCase(deletePost, (state, action) => {})
-//     .addCase(startEditPost, (state, action) => {})
-//     .addCase(cancelEditPost, (state) => {
-//       state.editPost = null;
-//     })
-//     .addCase(finishEditPost, (state, action) => {
-//       const postId = action.payload.id;
-//       state.postList;
-//       state.editPost = null;
-//     });
-// });
 
 export const getPostList = createAsyncThunk(
   "blog/getPostList",
   async (_, thunkAPI) => {
-    const response = await getData();
-    return response.data;
+    try {
+      const response = await getData();
+
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
   }
 );
 
 export const addPost = createAsyncThunk(
   "blog/addPost",
-  async (body: Omit<Post, "_id">, thunkAPI) => {
-    const response = await postData(body);
-    return response.data;
+  async (body: Omit<IPost, "_id">, thunkAPI) => {
+    try {
+      const response = await postData(body);
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
   }
 );
 
 export const updatePost = createAsyncThunk(
   "blog/updatePost",
-  async ({ postId, body }: { postId: string; body: Post }, thunkAPI) => {
-    const response = await putData(body, postId);
-    return response.data;
+  async ({ postId, body }: { postId: string; body: IPost }, thunkAPI) => {
+    try {
+      const response = await putData(body, postId);
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
   }
 );
 
 export const deletePost = createAsyncThunk(
   "blog/deletePost",
   async (postId: string, thunkAPI) => {
-    const response = await deleteData(postId);
-    return response.data;
+    try {
+      const response = await deleteData(postId);
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
   }
 );
 
@@ -91,17 +81,53 @@ const blogSlice = createSlice({
     builder
       .addCase(getPostList.fulfilled, (state, action) => {
         state.postList = action.payload;
+        state.isLoading = false;
+      })
+      .addCase(getPostList.pending, (state, action) => {
+        state.isLoading = true;
+      })
+      .addCase(getPostList.rejected, (state, action) => {
+        state.isLoading = false;
       })
       .addCase(addPost.fulfilled, (state, action) => {
         state.postList.push(action.payload);
+        state.isLoading = false;
+      })
+      .addCase(addPost.pending, (state, action) => {
+        state.isLoading = true;
+      })
+      .addCase(addPost.rejected, (state, action) => {
+        state.isLoading = false;
       })
       .addCase(updatePost.fulfilled, (state, action) => {
+        const updatedPost = action.payload;
+        const existingPostIndex = state.postList.findIndex(
+          (post) => post._id === updatedPost._id
+        );
+
+        if (existingPostIndex !== -1) {
+          state.postList[existingPostIndex] = updatedPost;
+        }
+
         state.editPost = null;
+        state.isLoading = false;
+      })
+      .addCase(updatePost.pending, (state, action) => {
+        state.isLoading = true;
+      })
+      .addCase(updatePost.rejected, (state, action) => {
+        state.isLoading = false;
       })
       .addCase(deletePost.fulfilled, (state, action) => {
         state.postList = state.postList.filter(
-          (post) => post._id !== action.payload
+          (post) => post._id !== action.payload._id
         );
+      })
+      .addCase(deletePost.pending, (state, action) => {
+        state.isLoading = true;
+      })
+      .addCase(deletePost.rejected, (state, action) => {
+        state.isLoading = false;
       });
   },
 });

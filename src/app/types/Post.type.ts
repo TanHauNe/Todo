@@ -1,7 +1,12 @@
-export interface Post {
-  _id?: any;
+export interface IPost {
+  _id?: string;
   title: string;
   desc: string;
   status: number;
-  userId?: string;
+  user_id?: string;
+}
+
+export interface ICreatePost {
+  accessToken: string;
+  userId: string;
 }
