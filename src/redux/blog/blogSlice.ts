@@ -79,25 +79,28 @@ const blogSlice = createSlice({
   },
   extraReducers(builder) {
     builder
+      .addCase(getPostList.pending, (state, action) => {
+        state.isLoading = true;
+      })
       .addCase(getPostList.fulfilled, (state, action) => {
         state.postList = action.payload;
         state.isLoading = false;
       })
-      .addCase(getPostList.pending, (state, action) => {
-        state.isLoading = true;
-      })
       .addCase(getPostList.rejected, (state, action) => {
-        state.isLoading = false;
-      })
-      .addCase(addPost.fulfilled, (state, action) => {
-        state.postList.push(action.payload);
         state.isLoading = false;
       })
       .addCase(addPost.pending, (state, action) => {
         state.isLoading = true;
       })
+      .addCase(addPost.fulfilled, (state, action) => {
+        state.postList.push(action.payload);
+        state.isLoading = false;
+      })
       .addCase(addPost.rejected, (state, action) => {
         state.isLoading = false;
+      })
+      .addCase(updatePost.pending, (state, action) => {
+        state.isLoading = true;
       })
       .addCase(updatePost.fulfilled, (state, action) => {
         const updatedPost = action.payload;
@@ -112,19 +115,16 @@ const blogSlice = createSlice({
         state.editPost = null;
         state.isLoading = false;
       })
-      .addCase(updatePost.pending, (state, action) => {
-        state.isLoading = true;
-      })
       .addCase(updatePost.rejected, (state, action) => {
         state.isLoading = false;
+      })
+      .addCase(deletePost.pending, (state, action) => {
+        state.isLoading = true;
       })
       .addCase(deletePost.fulfilled, (state, action) => {
         state.postList = state.postList.filter(
           (post) => post._id !== action.payload._id
         );
-      })
-      .addCase(deletePost.pending, (state, action) => {
-        state.isLoading = true;
       })
       .addCase(deletePost.rejected, (state, action) => {
         state.isLoading = false;

@@ -1,17 +1,19 @@
 "use client";
 
 import { IPost } from "@/app/types/Post.type";
+import InputComponent from "@/common/InputComponent";
 import { addPost, cancelEditPost, updatePost } from "@/redux/blog/blogSlice";
 import { RootState, useAppDispatch } from "@/redux/store";
-import { Button, Input, Select } from "antd";
-import { useRouter } from "next/navigation";
+import { Button, Form, Select } from "antd";
 import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { useSelector } from "react-redux";
 import styles from "./CreatePost.module.css";
-import InputComponent from "@/common/InputComponent";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { schema } from "@/utils/schema";
 
 const CreatePost = () => {
+  const createPostSchema = schema.pick(["title", "desc"]);
   const dispatch = useAppDispatch();
   const editPost = useSelector((state: RootState) => state.blog.editPost);
   const [showError, setShowError] = useState("");
@@ -22,12 +24,14 @@ const CreatePost = () => {
   }
 
   const optionsSelect = [
-    { value: "1", label: "1" },
-    { value: "2", label: "2" },
-    { value: "3", label: "3" },
+    { value: 1, label: "Chua lam" },
+    { value: 2, label: "Dang lam" },
+    { value: 3, label: "Da lam" },
   ];
 
-  const form = useForm<IPost>();
+  const form = useForm<IPost>({
+    resolver: yupResolver(createPostSchema),
+  });
   const { register, control, handleSubmit, formState, setValue } = form;
   const { errors } = formState;
 
@@ -69,15 +73,30 @@ const CreatePost = () => {
 
   return (
     <div className={styles.container}>
-      <form
+      <Form
         className={styles.post_form}
-        onSubmit={handleSubmit(onSubmit)}
+        onFinish={handleSubmit(onSubmit)}
         onReset={handleCancelEditPost}
+        layout="vertical"
       >
-        <InputComponent name="title" control={control} label="Tiêu đề" />
-        <InputComponent name="desc" control={control} label="Mô tả" />
-        <div className={styles.flex_center}>
-          <label>Trạng thái</label>
+        <Form.Item
+          name="title"
+          validateStatus={errors.title ? "error" : ""}
+          label="Tiêu đề"
+          help={errors.title?.message}
+        >
+          <InputComponent name="title" control={control} />
+        </Form.Item>
+        <Form.Item
+          name="desc"
+          validateStatus={errors.desc ? "error" : ""}
+          help={errors.desc?.message}
+          label="Mô tả"
+        >
+          <InputComponent name="desc" control={control} />
+        </Form.Item>
+
+        <Form.Item name="status" label="Trạng thái">
           <Controller
             name="status"
             control={control}
@@ -89,8 +108,7 @@ const CreatePost = () => {
               />
             )}
           />
-        </div>
-
+        </Form.Item>
         {editPost ? (
           <div className={styles.flex_center}>
             <Button htmlType="submit" type="primary">
@@ -105,7 +123,7 @@ const CreatePost = () => {
             Upload Post
           </Button>
         )}
-      </form>
+      </Form>
     </div>
   );
 };

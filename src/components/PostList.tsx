@@ -16,7 +16,6 @@ const PostList = () => {
 
   const handleDelete = (postId: string) => {
     dispatch(deletePost(postId));
-    dispatch(getPostList());
   };
 
   const handleStartEditPost = (postId: string) => {

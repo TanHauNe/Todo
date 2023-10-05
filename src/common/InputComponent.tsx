@@ -2,10 +2,9 @@ import { Controller } from "react-hook-form";
 import { Input } from "antd";
 import { IInput } from "@/app/types/Input.type";
 
-const InputComponent = ({ name, control, placeholder, label }: IInput) => {
+const InputComponent = ({ name, control, placeholder }: IInput) => {
   return (
     <div>
-      <label>{label}</label>
       <Controller
         name={name}
         control={control}

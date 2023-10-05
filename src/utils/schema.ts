@@ -10,7 +10,9 @@ export const schema = yup.object({
     .required("Password là bắt buộc")
     .min(8, "Mật khẩu phải có ít nhất 8 ký tự")
     .max(16, "Mật khẩu phải có tối đa 16 ký tự"),
-  full_name: yup.string().required("Fullname là bắt buộc"),
+  full_name: yup.string().required("Họ và tên là bắt buộc"),
+  desc: yup.string().required("Mô tả là bắt buộc"),
+  title: yup.string().required("Tiêu đề là bắt buộc"),
   url_img: yup
     .string()
     .url("Vui lòng nhập một URL hợp lệ cho ảnh đại diện")

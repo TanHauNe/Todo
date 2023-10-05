@@ -14,8 +14,6 @@ if (typeof window !== "undefined") {
   console.log("You are on the server");
 }
 
-console.log(accessToken, userId);
-
 interface ApiResponse {
   data: any;
 }

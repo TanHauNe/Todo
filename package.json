@@ -16,6 +16,8 @@
     "antd": "^5.9.4",
     "axios": "^1.5.1",
     "clsx": "^2.0.0",
+    "i18next": "^23.5.1",
+    "i18next-react": "^0.2.2",
     "next": "latest",
     "react": "latest",
     "react-dom": "latest",

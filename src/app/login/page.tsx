@@ -49,27 +49,27 @@ const Login = () => {
 
   return (
     <div className={styles.container}>
-      <Form onFinish={handleSubmit(onSubmit)} className={styles.login_form}>
+      <Form
+        onFinish={handleSubmit(onSubmit)}
+        className={styles.login_form}
+        layout="vertical"
+      >
         <Form.Item
           name="email"
           validateStatus={errors.email ? "error" : ""}
           help={errors.email?.message}
+          label="Email"
         >
-          <InputComponent
-            label="Email"
-            placeholder="Email"
-            name="email"
-            control={control}
-          />
+          <InputComponent placeholder="Email" name="email" control={control} />
         </Form.Item>
 
         <Form.Item
           name="password"
           validateStatus={errors.password ? "error" : ""}
           help={errors.password?.message}
+          label="Password"
         >
           <InputComponent
-            label="Password"
             name="password"
             placeholder="Password"
             control={control}
