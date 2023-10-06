@@ -1,6 +1,9 @@
-import { IPost } from "@/app/types/Post.type";
-import { Button, Card } from "antd";
+"use client";
+
+import { Button, Card, Tag } from "antd";
 import styles from "./PostItem.module.css";
+import { IPost } from "@/app/[lang]/types/Post.type";
+import { useEffect, useState } from "react";
 
 interface PostItemType {
   post: IPost;
@@ -13,17 +16,45 @@ const PostItem = ({
   handleDelete,
   handleStartEditPost,
 }: PostItemType) => {
+  const [status, setStatus] = useState({
+    color: "",
+    text: "",
+  });
+
+  useEffect(() => {
+    if (post.status === 2) {
+      setStatus({
+        color: "processing",
+        text: "Đang làm",
+      });
+    } else if (post.status === 3) {
+      setStatus({
+        color: "success",
+        text: "Đã làm",
+      });
+    } else {
+      setStatus({
+        color: "default",
+        text: "Chưa làm",
+      });
+    }
+  }, [post]);
+
   return (
     <Card bordered={false} title={post?.title} hoverable style={{ width: 600 }}>
       <p>{post.desc}</p>
       <div className={styles.button_group}>
+        <Tag color={status.color} className={styles.flex_center}>
+          {status.text}
+        </Tag>
         <Button
-          onClick={() => handleStartEditPost(post._id || "")}
           type="primary"
+          ghost
+          onClick={() => handleStartEditPost(post._id || "")}
         >
           Edit
         </Button>
-        <Button onClick={() => handleDelete(post._id || "")} type="primary">
+        <Button danger onClick={() => handleDelete(post._id || "")}>
           Delete
         </Button>
       </div>

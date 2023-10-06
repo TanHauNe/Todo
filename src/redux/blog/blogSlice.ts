@@ -1,4 +1,5 @@
-import { IPost } from "@/app/types/Post.type";
+import { IPost } from "@/app/[lang]/types/Post.type";
+import { setUserDataInCookie } from "@/common/cookie";
 import { deleteData, getData, postData, putData } from "@/utils/http";
 import { PayloadAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
@@ -6,12 +7,14 @@ interface BlogState {
   postList: IPost[];
   editPost: IPost | null;
   isLoading: boolean;
+  errorMessage?: string;
 }
 
 const initialState: BlogState = {
   postList: [],
   editPost: null,
   isLoading: false,
+  errorMessage: "",
 };
 
 export const getPostList = createAsyncThunk(
@@ -72,6 +75,7 @@ const blogSlice = createSlice({
       const foundPost =
         state.postList.find((post) => post._id === postId) || null;
       state.editPost = foundPost;
+      state.errorMessage = "";
     },
     cancelEditPost: (state) => {
       state.editPost = null;
@@ -91,27 +95,29 @@ const blogSlice = createSlice({
       })
       .addCase(addPost.pending, (state, action) => {
         state.isLoading = true;
+        state.errorMessage = "";
       })
       .addCase(addPost.fulfilled, (state, action) => {
         state.postList.push(action.payload);
         state.isLoading = false;
+        state.errorMessage = "";
       })
       .addCase(addPost.rejected, (state, action) => {
         state.isLoading = false;
+        state.errorMessage = "Tên tiêu đề đã tồn tại";
       })
       .addCase(updatePost.pending, (state, action) => {
         state.isLoading = true;
       })
       .addCase(updatePost.fulfilled, (state, action) => {
+        setUserDataInCookie("b", "a", 15);
         const updatedPost = action.payload;
         const existingPostIndex = state.postList.findIndex(
           (post) => post._id === updatedPost._id
         );
-
         if (existingPostIndex !== -1) {
           state.postList[existingPostIndex] = updatedPost;
         }
-
         state.editPost = null;
         state.isLoading = false;
       })

@@ -1,7 +1,8 @@
-import { IPost } from "@/app/types/Post.type";
-import { IAuth, ILogin } from "@/app/types/User.type";
-import { deleteData, getData, loginAPI, postData, putData } from "@/utils/http";
-import { PayloadAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { IAuth, ILogin } from "@/app/[lang]/types/User.type";
+import { setUserDataInCookie } from "@/common/cookie";
+
+import { loginAPI } from "@/utils/http";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
 interface UserState {
   auth: IAuth;
@@ -47,8 +48,11 @@ const blogSlice = createSlice({
       .addCase(loginUser.fulfilled, (state, action) => {
         state.auth = action.payload;
         const { user, access_token } = action.payload;
+        const userId = user?._id;
+
         localStorage.setItem("access_token", access_token);
-        localStorage.setItem("user_id", user?._id);
+        localStorage.setItem("user_id", userId);
+        // setUserDataInCookie(access_token, "a", 15);
         state.isLoading = false;
       })
       .addCase(loginUser.pending, (state, action) => {

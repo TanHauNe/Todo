@@ -1,24 +1,21 @@
 "use client";
 
 import InputComponent from "@/common/InputComponent";
-import { yupResolver } from "@hookform/resolvers/yup";
 import { RootState, useAppDispatch } from "@/redux/store";
-import { Button, Form } from "antd";
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
-import { useDispatch, useSelector } from "react-redux";
-import { ILogin } from "../types/User.type";
-import styles from "./page.module.css";
 import { loginUser } from "@/redux/user/userSlice";
 import { schema } from "@/utils/schema";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { Button, Form } from "antd";
+import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
+import { useSelector } from "react-redux";
+import { ILogin } from "../types/User.type";
+import styles from "./page.module.css";
 
 const Login = () => {
   const loginSchema = schema.pick(["email", "password"]);
   const dispatch = useAppDispatch();
-  const [showError, setShowError] = useState("");
   const user = useSelector((state: RootState) => state.user);
-  const token = user.auth.access_token;
 
   const route = useRouter();
   const form = useForm<ILogin>({
@@ -29,22 +26,18 @@ const Login = () => {
     resolver: yupResolver(loginSchema),
   });
 
-  useEffect(() => {
-    if (user.auth?.access_token) {
-      route.push("/blog");
-    }
-  }, [token]);
-
   const { control, handleSubmit, formState } = form;
   const { errors } = formState;
 
   const onSubmit = (data: ILogin) => {
-    const postData = {
+    const loginData = {
       email: data.email,
       password: data.password,
     };
 
-    dispatch(loginUser(postData));
+    dispatch(loginUser(loginData)).then(() => {
+      route.push("blog");
+    });
   };
 
   return (

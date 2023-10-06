@@ -3,3 +3,9 @@
   justify-content: flex-end;
   gap: 20px;
 }
+
+.flex_center {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}

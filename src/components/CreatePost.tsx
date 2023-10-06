@@ -1,32 +1,38 @@
 "use client";
 
-import { IPost } from "@/app/types/Post.type";
 import InputComponent from "@/common/InputComponent";
 import { addPost, cancelEditPost, updatePost } from "@/redux/blog/blogSlice";
 import { RootState, useAppDispatch } from "@/redux/store";
-import { Button, Form, Select } from "antd";
+import { Button, Form, Select, Typography } from "antd";
 import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { useSelector } from "react-redux";
 import styles from "./CreatePost.module.css";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { schema } from "@/utils/schema";
+import { IPost } from "@/app/[lang]/types/Post.type";
 
 const CreatePost = () => {
+  const { Text } = Typography;
   const createPostSchema = schema.pick(["title", "desc"]);
+  const [userId, setUserId] = useState("");
   const dispatch = useAppDispatch();
   const editPost = useSelector((state: RootState) => state.blog.editPost);
-  const [showError, setShowError] = useState("");
-  let userId = "";
+  const errorMessage = useSelector(
+    (state: RootState) => state.blog.errorMessage
+  );
+  // let userId = "";
 
-  if (typeof window !== "undefined") {
-    userId = localStorage.getItem("user_id") || "";
-  }
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      return setUserId(localStorage.getItem("user_id") || "");
+    }
+  }, []);
 
   const optionsSelect = [
-    { value: 1, label: "Chua lam" },
-    { value: 2, label: "Dang lam" },
-    { value: 3, label: "Da lam" },
+    { value: 1, label: "Chưa làm" },
+    { value: 2, label: "Đang làm" },
+    { value: 3, label: "Đã làm" },
   ];
 
   const form = useForm<IPost>({
@@ -109,12 +115,16 @@ const CreatePost = () => {
             )}
           />
         </Form.Item>
+
+        <div className={styles.flex_center}>
+          {errorMessage === "" ? "" : <Text type="danger">{errorMessage}</Text>}
+        </div>
         {editPost ? (
           <div className={styles.flex_center}>
             <Button htmlType="submit" type="primary">
               Update Post
             </Button>
-            <Button htmlType="reset" type="primary">
+            <Button danger htmlType="reset" type="primary">
               Cancel
             </Button>
           </div>

@@ -1,5 +1,6 @@
-
 import { Providers } from "@/redux/provider";
+import Header from "@/components/Header";
+import "./globals.css";
 
 export const metadata = {
   title: "Create Next App",
