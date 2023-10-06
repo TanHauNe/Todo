@@ -61,7 +61,6 @@ const blogSlice = createSlice({
       .addCase(loginUser.rejected, (state, action) => {
         state.isLoading = false;
         state.isError = true;
-        console.log(action);
       });
   },
 });
