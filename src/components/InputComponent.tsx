@@ -1,6 +1,6 @@
 import { Controller } from "react-hook-form";
 import { Input } from "antd";
-import { IInput } from "@/app/types/Input.type";
+import { IInput } from "../types/Input.type";
 
 const InputComponent = ({ name, control, placeholder }: IInput) => {
   return (

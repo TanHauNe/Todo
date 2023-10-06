@@ -1,18 +1,23 @@
-import { IPost } from "@/app/[lang]/types/Post.type";
-import { setUserDataInCookie } from "@/common/cookie";
+import { IPost } from "../../types/Post.type";
 import { deleteData, getData, postData, putData } from "@/utils/http";
 import { PayloadAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
+const initEditPost: IPost = {
+  title: "",
+  desc: "",
+  status: 1,
+};
+
 interface BlogState {
   postList: IPost[];
-  editPost: IPost | null;
+  editPost: IPost;
   isLoading: boolean;
   errorMessage?: string;
 }
 
 const initialState: BlogState = {
   postList: [],
-  editPost: null,
+  editPost: initEditPost,
   isLoading: false,
   errorMessage: "",
 };
@@ -73,12 +78,12 @@ const blogSlice = createSlice({
     startEditPost: (state, action: PayloadAction<string>) => {
       const postId = action.payload;
       const foundPost =
-        state.postList.find((post) => post._id === postId) || null;
+        state.postList.find((post) => post._id === postId) || initEditPost;
       state.editPost = foundPost;
       state.errorMessage = "";
     },
     cancelEditPost: (state) => {
-      state.editPost = null;
+      state.editPost = initEditPost;
     },
   },
   extraReducers(builder) {
@@ -110,7 +115,6 @@ const blogSlice = createSlice({
         state.isLoading = true;
       })
       .addCase(updatePost.fulfilled, (state, action) => {
-        setUserDataInCookie("b", "a", 15);
         const updatedPost = action.payload;
         const existingPostIndex = state.postList.findIndex(
           (post) => post._id === updatedPost._id
@@ -118,7 +122,7 @@ const blogSlice = createSlice({
         if (existingPostIndex !== -1) {
           state.postList[existingPostIndex] = updatedPost;
         }
-        state.editPost = null;
+        state.editPost = initEditPost;
         state.isLoading = false;
       })
       .addCase(updatePost.rejected, (state, action) => {

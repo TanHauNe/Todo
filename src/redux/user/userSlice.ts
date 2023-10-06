@@ -1,5 +1,5 @@
-import { IAuth, ILogin } from "@/app/[lang]/types/User.type";
-import { setUserDataInCookie } from "@/common/cookie";
+import { IAuth, ILogin } from "../../types/User.type";
+import { setSessionStorage, setTokenCookie } from "@/utils/cookie";
 
 import { loginAPI } from "@/utils/http";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
@@ -7,6 +7,7 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 interface UserState {
   auth: IAuth;
   isLoading: boolean;
+  isError: boolean;
 }
 
 const initialState: UserState = {
@@ -25,6 +26,7 @@ const initialState: UserState = {
     refresh_token: "",
   },
   isLoading: false,
+  isError: false,
 };
 
 export const loginUser = createAsyncThunk(
@@ -45,21 +47,21 @@ const blogSlice = createSlice({
   reducers: {},
   extraReducers(builder) {
     builder
-      .addCase(loginUser.fulfilled, (state, action) => {
-        state.auth = action.payload;
-        const { user, access_token } = action.payload;
-        const userId = user?._id;
-
-        localStorage.setItem("access_token", access_token);
-        localStorage.setItem("user_id", userId);
-        // setUserDataInCookie(access_token, "a", 15);
-        state.isLoading = false;
-      })
       .addCase(loginUser.pending, (state, action) => {
         state.isLoading = true;
       })
+      .addCase(loginUser.fulfilled, (state, action) => {
+        state.auth = action.payload;
+        const { user, access_token } = action.payload;
+        setSessionStorage(user);
+        setTokenCookie(access_token, 2);
+        state.isLoading = false;
+        state.isError = false;
+      })
       .addCase(loginUser.rejected, (state, action) => {
         state.isLoading = false;
+        state.isError = true;
+        console.log(action);
       });
   },
 });

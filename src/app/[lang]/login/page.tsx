@@ -1,24 +1,34 @@
 "use client";
 
-import InputComponent from "@/common/InputComponent";
 import { RootState, useAppDispatch } from "@/redux/store";
 import { loginUser } from "@/redux/user/userSlice";
 import { schema } from "@/utils/schema";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Button, Form } from "antd";
 import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useSelector } from "react-redux";
-import { ILogin } from "../types/User.type";
+import { ILogin } from "../../../types/User.type";
 import styles from "./page.module.css";
+import { InputComponent } from "@/components";
 
 const Login = () => {
   const loginSchema = schema.pick(["email", "password"]);
   const dispatch = useAppDispatch();
   const user = useSelector((state: RootState) => state.user);
+  const isError = useSelector((state: RootState) => state.user.isError);
+  const auth = user.auth.access_token;
+
+  useEffect(() => {
+    if (auth) {
+      route.push("blog");
+    }
+  }, [auth]);
 
   const route = useRouter();
   const form = useForm<ILogin>({
+    mode: "all",
     defaultValues: {
       email: "",
       password: "",
@@ -35,9 +45,7 @@ const Login = () => {
       password: data.password,
     };
 
-    dispatch(loginUser(loginData)).then(() => {
-      route.push("blog");
-    });
+    dispatch(loginUser(loginData));
   };
 
   return (
@@ -68,7 +76,7 @@ const Login = () => {
             control={control}
           />
         </Form.Item>
-
+        <div>{isError ? "Đăng nhập không thành công" : ""}</div>
         <Form.Item>
           <Button type="primary" htmlType="submit">
             Login

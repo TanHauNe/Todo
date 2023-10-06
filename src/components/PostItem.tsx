@@ -1,9 +1,9 @@
 "use client";
 
 import { Button, Card, Tag } from "antd";
-import styles from "./PostItem.module.css";
-import { IPost } from "@/app/[lang]/types/Post.type";
 import { useEffect, useState } from "react";
+import { IPost } from "../types/Post.type";
+import styles from "./PostItem.module.css";
 
 interface PostItemType {
   post: IPost;

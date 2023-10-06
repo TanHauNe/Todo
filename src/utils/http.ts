@@ -1,18 +1,13 @@
 "use client";
 
+import { getSessionStorage, getTokenFromCookie } from "@/utils/cookie";
 import axios, { AxiosResponse, AxiosError } from "axios";
 
 const apiUrl = "https://todoapp-uit.vercel.app";
 
-let accessToken = "";
-let userId = "";
-
-if (typeof window !== "undefined") {
-  accessToken = localStorage.getItem("access_token") || "";
-  userId = localStorage.getItem("user_id") || "";
-} else {
-  console.log("You are on the server");
-}
+const accessToken = getTokenFromCookie();
+const user = getSessionStorage();
+const userId = user?._id;
 
 interface ApiResponse {
   data: any;

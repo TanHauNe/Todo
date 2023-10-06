@@ -1,16 +1,17 @@
 "use client";
 
-import InputComponent from "@/common/InputComponent";
+import { getSessionStorage } from "@/utils/cookie";
 import { addPost, cancelEditPost, updatePost } from "@/redux/blog/blogSlice";
 import { RootState, useAppDispatch } from "@/redux/store";
+import { schema } from "@/utils/schema";
+import { yupResolver } from "@hookform/resolvers/yup";
 import { Button, Form, Select, Typography } from "antd";
 import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { useSelector } from "react-redux";
+import { IPost } from "../types/Post.type";
 import styles from "./CreatePost.module.css";
-import { yupResolver } from "@hookform/resolvers/yup";
-import { schema } from "@/utils/schema";
-import { IPost } from "@/app/[lang]/types/Post.type";
+import { InputComponent } from ".";
 
 const CreatePost = () => {
   const { Text } = Typography;
@@ -21,11 +22,11 @@ const CreatePost = () => {
   const errorMessage = useSelector(
     (state: RootState) => state.blog.errorMessage
   );
-  // let userId = "";
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      return setUserId(localStorage.getItem("user_id") || "");
+      const user = getSessionStorage();
+      return setUserId(user?._id || "");
     }
   }, []);
 
@@ -36,16 +37,20 @@ const CreatePost = () => {
   ];
 
   const form = useForm<IPost>({
+    defaultValues: {
+      title: editPost?.title,
+      desc: editPost?.desc,
+      status: editPost?.status,
+    },
+    mode: "all",
     resolver: yupResolver(createPostSchema),
   });
-  const { register, control, handleSubmit, formState, setValue } = form;
+  const { control, handleSubmit, formState, reset } = form;
   const { errors } = formState;
 
   useEffect(() => {
-    setValue("title", editPost?.title || "");
-    setValue("desc", editPost?.desc || "");
-    setValue("status", editPost?.status || 1);
-  }, [editPost, setValue]);
+    reset(editPost);
+  }, [editPost]);
 
   const onSubmit = (data: IPost) => {
     const postData = {
@@ -119,7 +124,7 @@ const CreatePost = () => {
         <div className={styles.flex_center}>
           {errorMessage === "" ? "" : <Text type="danger">{errorMessage}</Text>}
         </div>
-        {editPost ? (
+        {editPost.title !== "" ? (
           <div className={styles.flex_center}>
             <Button htmlType="submit" type="primary">
               Update Post
