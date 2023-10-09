@@ -1,0 +1,16 @@
+{
+  "navigation": {
+    "home": "Nha",
+    "about": "Ve"
+  },
+  "page": {
+    "login": {
+      "username": "Tài khoản",
+      "password": "Mật khẩu"
+    },
+    "about": {
+      "title": "About Us",
+      "description": " the about page"
+    }
+  }
+}
