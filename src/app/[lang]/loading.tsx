@@ -1,12 +1,10 @@
-import { Spin } from "antd";
+"use client"
+
+import { LoadingComponent } from "@/components";
 import "./globals.css";
 
 const Loading = () => {
-  return (
-    <div className="center">
-      <Spin size="large" />
-    </div>
-  );
+  return <LoadingComponent />;
 };
 
 export default Loading;

@@ -11,7 +11,7 @@ import { Controller, useForm } from "react-hook-form";
 import { useSelector } from "react-redux";
 import { IPost } from "../types/Post.type";
 import styles from "./CreatePost.module.css";
-import { InputComponent } from ".";
+import { ButtonComponent, InputComponent } from ".";
 
 const CreatePost = () => {
   const { Text } = Typography;
@@ -38,9 +38,9 @@ const CreatePost = () => {
 
   const form = useForm<IPost>({
     defaultValues: {
-      title: editPost?.title,
-      desc: editPost?.desc,
-      status: editPost?.status,
+      title: editPost?.title || "",
+      desc: editPost?.desc || "",
+      status: editPost?.status || 1,
     },
     mode: "all",
     resolver: yupResolver(createPostSchema),
@@ -60,7 +60,7 @@ const CreatePost = () => {
       user_id: userId?.toString(),
     };
 
-    if (editPost) {
+    if (editPost.title !== "") {
       dispatch(
         updatePost({
           postId: editPost._id || "",
@@ -134,9 +134,7 @@ const CreatePost = () => {
             </Button>
           </div>
         ) : (
-          <Button htmlType="submit" type="primary">
-            Upload Post
-          </Button>
+          <ButtonComponent htmlType="submit" content="Add post" />
         )}
       </Form>
     </div>

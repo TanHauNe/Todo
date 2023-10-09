@@ -4,6 +4,7 @@ import { Button, Card, Tag } from "antd";
 import { useEffect, useState } from "react";
 import { IPost } from "../types/Post.type";
 import styles from "./PostItem.module.css";
+import { ButtonComponent } from ".";
 
 interface PostItemType {
   post: IPost;
@@ -47,16 +48,15 @@ const PostItem = ({
         <Tag color={status.color} className={styles.flex_center}>
           {status.text}
         </Tag>
-        <Button
-          type="primary"
-          ghost
+        <ButtonComponent
+          content="Edit"
           onClick={() => handleStartEditPost(post._id || "")}
-        >
-          Edit
-        </Button>
-        <Button danger onClick={() => handleDelete(post._id || "")}>
-          Delete
-        </Button>
+        />
+        <ButtonComponent
+          danger
+          content="Delete"
+          onClick={() => handleDelete(post._id || "")}
+        />
       </div>
     </Card>
   );

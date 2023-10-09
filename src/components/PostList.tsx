@@ -1,3 +1,5 @@
+"use client"
+
 import { deletePost, getPostList, startEditPost } from "@/redux/blog/blogSlice";
 import { RootState, useAppDispatch } from "@/redux/store";
 import { useEffect } from "react";

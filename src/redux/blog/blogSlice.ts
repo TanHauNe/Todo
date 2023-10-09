@@ -24,49 +24,67 @@ const initialState: BlogState = {
 
 export const getPostList = createAsyncThunk(
   "blog/getPostList",
-  async (_, thunkAPI) => {
+  async (_, { rejectWithValue }) => {
     try {
       const response = await getData();
-
       return response.data;
-    } catch (error) {
-      throw error;
+    } catch (error: any) {
+      if (error.response) {
+        return rejectWithValue(error.response.data);
+      } else {
+        return rejectWithValue("Lỗi không xác định xảy ra");
+      }
     }
   }
 );
 
 export const addPost = createAsyncThunk(
   "blog/addPost",
-  async (body: Omit<IPost, "_id">, thunkAPI) => {
+  async (body: Omit<IPost, "_id">, { rejectWithValue }) => {
     try {
       const response = await postData(body);
       return response.data;
-    } catch (error) {
-      throw error;
+    } catch (error: any) {
+      if (error.response) {
+        return rejectWithValue(error.response.data);
+      } else {
+        return rejectWithValue("Lỗi không xác định xảy ra");
+      }
     }
   }
 );
 
 export const updatePost = createAsyncThunk(
   "blog/updatePost",
-  async ({ postId, body }: { postId: string; body: IPost }, thunkAPI) => {
+  async (
+    { postId, body }: { postId: string; body: IPost },
+    { rejectWithValue }
+  ) => {
     try {
       const response = await putData(body, postId);
       return response.data;
-    } catch (error) {
-      throw error;
+    } catch (error: any) {
+      if (error.response) {
+        return rejectWithValue(error.response.data);
+      } else {
+        return rejectWithValue("Lỗi không xác định xảy ra");
+      }
     }
   }
 );
 
 export const deletePost = createAsyncThunk(
   "blog/deletePost",
-  async (postId: string, thunkAPI) => {
+  async (postId: string, { rejectWithValue }) => {
     try {
       const response = await deleteData(postId);
       return response.data;
-    } catch (error) {
-      throw error;
+    } catch (error: any) {
+      if (error.response) {
+        return rejectWithValue(error.response.data);
+      } else {
+        return rejectWithValue("Lỗi không xác định xảy ra");
+      }
     }
   }
 );
